@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "windows.h": "c",
+        "money_to_string.h": "c",
+        "string.h": "c",
+        "type_traits": "c"
+    }
+}
