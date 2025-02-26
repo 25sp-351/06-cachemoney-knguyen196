@@ -1,10 +1,11 @@
 #include "money_to_string.h"
+#include "memoization.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
 #ifdef _WIN32
-#define EXPORT __declspec(dllexport)
+#define EXPORT __declspec( dllexport )
 #else
 #define EXPORT
 #endif
@@ -18,14 +19,15 @@ typedef struct {
 static MoneyCacheEntry cache[CACHE_SIZE];
 static int cache_count = 0;
 
-static char *cached_money_to_string(long long value) {
+// Checks cache first
+static char *cached_money_to_string( long long value ) {
     for  ( int ix = 0; ix < cache_count; ix++ ) {
         if ( cache[ix].key == value ) {
             return cache[ix].value;
         }
     }
 
-    char *result = money_to_string( value );
+    char *result = memoized_money_to_string( value );
 
     if ( cache_count < CACHE_SIZE ) {
         cache[cache_count].key = value;
@@ -36,8 +38,8 @@ static char *cached_money_to_string(long long value) {
         return result;
 }
 
-EXPORT MoneyProviderFunction set_provider(MoneyProviderFunction downstream) {
-    (void)downstream;
+EXPORT MoneyProviderFunction set_provider( MoneyProviderFunction downstream ) {
+    ( void )downstream;
     return cached_money_to_string;
 }
 
@@ -56,7 +58,7 @@ EXPORT void reset_statistics() {
 }
 
 EXPORT MoneyCacheStats *statistics( void ) {
-    MoneyCacheStats *s = malloc(sizeof(MoneyCacheStats));
+    MoneyCacheStats *s = malloc( sizeof(MoneyCacheStats) );
     *s = stats;
     return s;
 }
